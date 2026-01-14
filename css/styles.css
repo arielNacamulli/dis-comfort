@@ -1,0 +1,196 @@
+:root {
+    --bg-color: #000000;
+    --text-color: #ffffff;
+    --card-bg: #1c1c1e;
+    --accent-color: #ffffff;
+    --secondary-text: #8e8e93;
+    --border-radius: 16px;
+    --padding: 24px;
+}
+
+* {
+    box-sizing: border-box;
+    outline: none;
+    -webkit-tap-highlight-color: transparent;
+}
+
+body {
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    height: 100vh; /* Fallback */
+    height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    font-size: 17px;
+}
+
+/* Header */
+header {
+    padding: var(--padding);
+    padding-top: max(var(--padding), env(safe-area-inset-top));
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-shrink: 0;
+}
+
+h1 {
+    margin: 0;
+    font-size: 34px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+}
+
+.streak-container {
+    font-size: 20px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+/* Main Content */
+main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 0 var(--padding);
+    overflow: hidden;
+    gap: 20px;
+}
+
+/* Input Section */
+#input-section {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    flex-shrink: 0;
+}
+
+label {
+    font-size: 22px;
+    font-weight: 600;
+    line-height: 1.3;
+}
+
+textarea {
+    background-color: var(--card-bg);
+    border: none;
+    border-radius: var(--border-radius);
+    color: var(--text-color);
+    padding: 16px;
+    font-family: inherit;
+    font-size: 17px;
+    width: 100%;
+    height: 120px;
+    resize: none;
+    appearance: none;
+}
+
+textarea::placeholder {
+    color: var(--secondary-text);
+}
+
+button.primary-btn {
+    background-color: var(--accent-color);
+    color: var(--bg-color);
+    border: none;
+    border-radius: var(--border-radius);
+    padding: 16px;
+    font-size: 17px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity 0.2s;
+}
+
+button.primary-btn:active {
+    opacity: 0.8;
+}
+
+/* Message Section for Completed Day */
+#message-section {
+    background-color: var(--card-bg);
+    border-radius: var(--border-radius);
+    padding: 30px;
+    text-align: center;
+    flex-shrink: 0;
+}
+
+#message-section h2 {
+    margin: 0 0 8px 0;
+    font-size: 20px;
+}
+
+#message-section p {
+    margin: 0;
+    color: var(--secondary-text);
+}
+
+/* History Section */
+#history-section {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow-y: hidden; /* Becomes scrollable internally */
+}
+
+#history-title {
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--secondary-text);
+    margin-bottom: 10px;
+    font-weight: 600;
+}
+
+#history-list {
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.entry-card {
+    background-color: var(--card-bg);
+    padding: 16px;
+    border-radius: 12px;
+}
+
+.entry-date {
+    font-size: 13px;
+    color: var(--secondary-text);
+    margin-bottom: 6px;
+}
+
+.entry-text {
+    font-size: 17px;
+    line-height: 1.4;
+    white-space: pre-wrap;
+}
+
+/* Footer / Utilities */
+footer {
+    padding: var(--padding);
+    padding-bottom: max(var(--padding), env(safe-area-inset-bottom));
+    flex-shrink: 0;
+    display: flex;
+    justify-content: center;
+}
+
+button.text-btn {
+    background: none;
+    border: none;
+    color: var(--secondary-text);
+    font-size: 15px;
+    padding: 10px;
+    cursor: pointer;
+}
+
+.hidden {
+    display: none !important;
+}

@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    
+    <!-- PWA & Mobile Capabilities -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#000000">
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="assets/icon.png">
+    <link rel="icon" type="image/png" href="assets/icon.png">
+
+    <title>Beyond</title>
+    
+    <!-- Styles -->
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+    <header>
+        <h1>Beyond</h1>
+        <div class="streak-container">
+            <span id="streak-count">0</span> <span>🔥</span>
+        </div>
+    </header>
+
+    <main>
+        <!-- Daily Input -->
+        <div id="input-section">
+            <label for="daily-input">Cosa hai fatto oggi per uscire dalla tua comfort zone?</label>
+            <textarea id="daily-input" placeholder="Scrivi qui la tua sfida..."></textarea>
+            <button class="primary-btn" id="save-btn">Registra</button>
+        </div>
+
+        <!-- Success Message (Already done today) -->
+        <div id="message-section" class="hidden">
+            <h2>Ottimo lavoro!</h2>
+            <p>Hai già registrato la tua sfida di oggi.</p>
+        </div>
+
+        <!-- History -->
+        <div id="history-section">
+            <div id="history-title">Archivio Storico</div>
+            <div id="history-list">
+                <!-- Entries will be injected here -->
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <button class="text-btn" id="export-btn">Esporta Dati</button>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="js/app.js"></script>
+</body>
+</html>
