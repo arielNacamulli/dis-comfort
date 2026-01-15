@@ -10,10 +10,18 @@ function saveEntries(entries) {
     localStorage.setItem(DB_KEY, JSON.stringify(entries));
 }
 
+// Global reference for open swipes to close them
+let currentOpenSwipe = null;
+
 function deleteEntry(timestamp) {
     let entries = getEntries();
     entries = entries.filter(e => e.timestamp !== timestamp);
     saveEntries(entries);
+    // If we are in detail view, close it
+    const detailView = document.getElementById('detail-view');
+    if (detailView.classList.contains('open')) {
+        closeDetail();
+    }
     render();
 }
 
@@ -85,49 +93,126 @@ function render() {
     // Sort descending
     const sortedEntries = [...entries].sort((a, b) => b.timestamp - a.timestamp);
 
-    sortedEntries.forEach(entry => {
-        const card = document.createElement('div');
-        card.className = 'entry-card';
+        const wrapper = document.createElement('div');
+        wrapper.className = 'entry-wrapper';
+
+        // 1. Actions Layer (Behind)
+        const actionsDiv = document.createElement('div');
+        actionsDiv.className = 'entry-actions';
+        
+        const deleteBtn = document.createElement('button');
+        deleteBtn.className = 'delete-btn-action';
+        deleteBtn.innerHTML = `
+            <svg viewBox="0 0 24 24">
+                <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
+            </svg>
+        `;
+        deleteBtn.onclick = (e) => {
+            e.stopPropagation(); // Prevent opening detail
+            if (confirm('Cancellare questa nota?')) {
+                deleteEntry(entry.timestamp);
+            }
+        };
+
+        actionsDiv.appendChild(deleteBtn);
+
+        // 2. Content Layer (Front)
+        const contentDiv = document.createElement('div');
+        contentDiv.className = 'entry-content';
 
         const dateDiv = document.createElement('div');
         dateDiv.className = 'entry-date';
-        // Format date nicely (e.g., "14/01/2026")
+        // Use full date as Title
         const dateObj = new Date(entry.timestamp);
         dateDiv.textContent = dateObj.toLocaleDateString('it-IT', {
-            weekday: 'short', day: 'numeric', month: 'long', year: 'numeric'
+            weekday: 'long', day: 'numeric', month: 'long'
         });
 
-        const textDiv = document.createElement('div');
-        textDiv.className = 'entry-text';
-        textDiv.textContent = entry.text;
+        const textPreviewDiv = document.createElement('div');
+        textPreviewDiv.className = 'entry-text-preview';
+        textPreviewDiv.textContent = entry.text;
 
-        const deleteBtn = document.createElement('button');
-        deleteBtn.textContent = '🗑️'; // or 'Elimina'
-        deleteBtn.className = 'delete-btn';
-        deleteBtn.style.marginLeft = 'auto'; // Simple push to right
-        deleteBtn.onclick = () => {
-             if(confirm('Sei sicuro di voler cancellare questa nota?')) {
-                 deleteEntry(entry.timestamp);
-             }
-        };
+        contentDiv.appendChild(dateDiv);
+        contentDiv.appendChild(textPreviewDiv);
 
-        const headerDiv = document.createElement('div');
-        headerDiv.style.display = 'flex';
-        headerDiv.style.justifyContent = 'space-between';
-        headerDiv.style.alignItems = 'center';
-        
-        // Move date into header to sit next to delete button if we want, 
-        // OR just put delete button at the bottom or top right.
-        // Let's create a simple header row for Date + Delete
-        
-        headerDiv.appendChild(dateDiv);
-        headerDiv.appendChild(deleteBtn);
+        wrapper.appendChild(actionsDiv);
+        wrapper.appendChild(contentDiv);
+        historyList.appendChild(wrapper);
 
-        card.appendChild(headerDiv);
-        card.appendChild(textDiv);
-        historyList.appendChild(card);
+        // --- Touch Logic for Swipe ---
+        let startX = 0;
+        let currentX = 0;
+        let isSwiping = false;
+
+        contentDiv.addEventListener('touchstart', (e) => {
+            startX = e.touches[0].clientX;
+            // Close other open swipes if any
+            if (currentOpenSwipe && currentOpenSwipe !== contentDiv) {
+                currentOpenSwipe.style.transform = 'translateX(0)';
+                currentOpenSwipe = null;
+            }
+            contentDiv.style.transition = 'none'; // removing transition for direct follow
+        }, { passive: true });
+
+        contentDiv.addEventListener('touchmove', (e) => {
+            const touchX = e.touches[0].clientX;
+            const diff = touchX - startX;
+
+            // Only allow left swipe
+            if (diff < 0) {
+                isSwiping = true;
+                // Limit the drag (Visual resistance)
+                const translateX = Math.max(diff, -100); 
+                contentDiv.style.transform = `translateX(${translateX}px)`;
+            }
+        }, { passive: true });
+
+        contentDiv.addEventListener('touchend', (e) => {
+            contentDiv.style.transition = 'transform 0.3s cubic-bezier(0.25, 1, 0.5, 1)';
+            const endX = e.changedTouches[0].clientX;
+            const diff = endX - startX;
+
+            // Threshold to snap open
+            if (diff < -50) {
+                contentDiv.style.transform = 'translateX(-80px)';
+                currentOpenSwipe = contentDiv;
+            } else {
+                contentDiv.style.transform = 'translateX(0)';
+                if (currentOpenSwipe === contentDiv) {
+                    currentOpenSwipe = null;
+                }
+            }
+
+            // Click handling (if it wasn't a swipe)
+            if (Math.abs(diff) < 5) { // minimal movement counts as click
+                openDetail(entry);
+            }
+            
+            isSwiping = false;
+        });
     });
 }
+
+function openDetail(entry) {
+    const detailView = document.getElementById('detail-view');
+    const detailDate = document.getElementById('detail-date');
+    const detailBody = document.getElementById('detail-body');
+
+    const dateObj = new Date(entry.timestamp);
+    detailDate.textContent = dateObj.toLocaleDateString('it-IT', {
+        weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'
+    });
+    detailBody.textContent = entry.text;
+
+    detailView.classList.add('open');
+}
+
+function closeDetail() {
+    document.getElementById('detail-view').classList.remove('open');
+}
+
+document.getElementById('detail-back').addEventListener('click', closeDetail);
+
 
 // --- Event Handlers ---
 document.getElementById('save-btn').addEventListener('click', () => {
