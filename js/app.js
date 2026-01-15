@@ -93,6 +93,7 @@ function render() {
     // Sort descending
     const sortedEntries = [...entries].sort((a, b) => b.timestamp - a.timestamp);
 
+    sortedEntries.forEach(entry => {
         const wrapper = document.createElement('div');
         wrapper.className = 'entry-wrapper';
 
@@ -141,7 +142,7 @@ function render() {
 
         // --- Touch Logic for Swipe ---
         let startX = 0;
-        let currentX = 0;
+        const threshold = -50;
         let isSwiping = false;
 
         contentDiv.addEventListener('touchstart', (e) => {
@@ -151,7 +152,7 @@ function render() {
                 currentOpenSwipe.style.transform = 'translateX(0)';
                 currentOpenSwipe = null;
             }
-            contentDiv.style.transition = 'none'; // removing transition for direct follow
+            contentDiv.style.transition = 'none'; 
         }, { passive: true });
 
         contentDiv.addEventListener('touchmove', (e) => {
@@ -161,7 +162,6 @@ function render() {
             // Only allow left swipe
             if (diff < 0) {
                 isSwiping = true;
-                // Limit the drag (Visual resistance)
                 const translateX = Math.max(diff, -100); 
                 contentDiv.style.transform = `translateX(${translateX}px)`;
             }
@@ -172,11 +172,12 @@ function render() {
             const endX = e.changedTouches[0].clientX;
             const diff = endX - startX;
 
-            // Threshold to snap open
-            if (diff < -50) {
+            if (diff < threshold) {
+                // Snap open
                 contentDiv.style.transform = 'translateX(-80px)';
                 currentOpenSwipe = contentDiv;
             } else {
+                // Snap closed
                 contentDiv.style.transform = 'translateX(0)';
                 if (currentOpenSwipe === contentDiv) {
                     currentOpenSwipe = null;
@@ -184,7 +185,7 @@ function render() {
             }
 
             // Click handling (if it wasn't a swipe)
-            if (Math.abs(diff) < 5) { // minimal movement counts as click
+            if (Math.abs(diff) < 5) { 
                 openDetail(entry);
             }
             
