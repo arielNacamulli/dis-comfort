@@ -10,6 +10,13 @@ function saveEntries(entries) {
     localStorage.setItem(DB_KEY, JSON.stringify(entries));
 }
 
+function deleteEntry(timestamp) {
+    let entries = getEntries();
+    entries = entries.filter(e => e.timestamp !== timestamp);
+    saveEntries(entries);
+    render();
+}
+
 // --- Core Logic ---
 function getTodayDateString() {
     return new Date().toISOString().split('T')[0];
@@ -94,7 +101,29 @@ function render() {
         textDiv.className = 'entry-text';
         textDiv.textContent = entry.text;
 
-        card.appendChild(dateDiv);
+        const deleteBtn = document.createElement('button');
+        deleteBtn.textContent = '🗑️'; // or 'Elimina'
+        deleteBtn.className = 'delete-btn';
+        deleteBtn.style.marginLeft = 'auto'; // Simple push to right
+        deleteBtn.onclick = () => {
+             if(confirm('Sei sicuro di voler cancellare questa nota?')) {
+                 deleteEntry(entry.timestamp);
+             }
+        };
+
+        const headerDiv = document.createElement('div');
+        headerDiv.style.display = 'flex';
+        headerDiv.style.justifyContent = 'space-between';
+        headerDiv.style.alignItems = 'center';
+        
+        // Move date into header to sit next to delete button if we want, 
+        // OR just put delete button at the bottom or top right.
+        // Let's create a simple header row for Date + Delete
+        
+        headerDiv.appendChild(dateDiv);
+        headerDiv.appendChild(deleteBtn);
+
+        card.appendChild(headerDiv);
         card.appendChild(textDiv);
         historyList.appendChild(card);
     });
